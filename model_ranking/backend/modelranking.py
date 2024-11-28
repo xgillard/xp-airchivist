@@ -13,6 +13,7 @@ origins = [
     "http://localhost:3000",  # development react
     "http://www.arch.be",
     "http://arch.be",
+    "*",
 ]
 
 app.add_middleware(

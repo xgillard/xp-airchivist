@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Tab, Tabs } from "@mui/material";
+import { Box, Container, Tab, Tabs } from "@mui/material";
 import ModelDetails from "./details_model";
 import TranscriptionDetails from "./details_transcription";
 
@@ -22,10 +22,12 @@ export function LabeledDetails({data, set_data}) {
     };
 
     return (<>
-        <Tabs centered value={tab} onChange={(_e,v) => set_tab(v)}>
-            <Tab value="text" label="Text" />
-            { Object.entries(data.docdata).map(([k,_v]) => <Tab key={`tab-${k}`} value={k} label={k} />) }
-        </Tabs>
+        <Box sx={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <Tabs variant="scrollable" value={tab} onChange={(_e,v) => set_tab(v)}>
+                <Tab value="text" label="Text" />
+                { Object.entries(data.docdata).map(([k,_v]) => <Tab key={`tab-${k}`} value={k} label={k} />) }
+            </Tabs>
+        </Box>
         <Container>
             {(tab === "text") && <TranscriptionDetails text={data.text} /> }
             {(tab !== "text") && <ModelDetails key={tab} data={data.docdata[tab]} set_ranking={setter(tab)} /> }

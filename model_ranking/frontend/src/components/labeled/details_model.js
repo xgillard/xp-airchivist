@@ -4,6 +4,10 @@ import { createPortal } from 'react-dom';
 import { Alert, Box, Rating, Stack } from '@mui/material';
 import FoldableList from '../foldable_list';
 
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import MapIcon from '@mui/icons-material/Map';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
 function ModelDetails({data, set_ranking}) {
     const params = useParams();
     const [err, set_err] = useState(null);
@@ -38,9 +42,9 @@ function ModelDetails({data, set_ranking}) {
                 <Rating name="size-medium"  max={5} value={data.ranking} onChange={on_ranking_changed} />
             </Box>
             <Box>
-                <FoldableList title="Persons"   data={data.persons} />
-                <FoldableList title="Locations" data={data.locations} />
-                <FoldableList title="Dates"     data={data.dates} />
+                <FoldableList icon={<EmojiPeopleIcon />}   title="people"    data={data.persons} />
+                <FoldableList icon={<MapIcon />}           title="locations" data={data.locations} />
+                <FoldableList icon={<CalendarMonthIcon />} title="dates"     data={data.dates} />
             </Box>
             {err && createPortal(<Alert severity='error' onClose={()=>{set_err(null)}}>An error happened</Alert>, document.getElementById('error')) }
         </Stack>);

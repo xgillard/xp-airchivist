@@ -7,7 +7,11 @@ import {loader as load_data, LabeledData} from './components/labeled/data';
 function ErrorToast() {
   const error = useRouteError();
   console.log(error);
-  return <div>Oops there was an error (service is probably down)</div>;
+  return (
+    <>
+      <div>Oops there was an error (service is probably down)</div>
+      <div>{process.env.REACT_APP_API_URL}</div>
+    </>);
 }
 
 function App() {
