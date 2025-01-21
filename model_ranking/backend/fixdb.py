@@ -10,4 +10,4 @@ db = [
 for model in db:
     with sqlite3.connect(f"./databases/{model}.db") as con:
         cursor = con.cursor()
-        cursor.execute("ALTER TABLE dataset ADD ranking INT DEFAULT 0")
+        cursor.execute("UPDATE dataset SET ranking = 0")

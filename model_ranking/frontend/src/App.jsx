@@ -10,7 +10,7 @@ function ErrorToast() {
   return (
     <>
       <div>Oops there was an error (service is probably down)</div>
-      <div>{process.env.REACT_APP_API_URL}</div>
+      <div>{import.meta.env.VITE_API_URL}</div>
     </>);
 }
 
