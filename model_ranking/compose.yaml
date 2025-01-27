@@ -2,7 +2,7 @@ name: model-ranking
 services:
   backend:
     build: ./backend
-    ports: ["8000:80"]
+    ports: ["8080:80"]
     volumes:
       - type: bind
         source: ./backend/databases
