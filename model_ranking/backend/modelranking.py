@@ -11,9 +11,10 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # development react
+    "http://modelranking-rest.arch.be",
+    "http://modelranking.arch.be",
     "http://www.arch.be",
     "http://arch.be",
-    "*",
 ]
 
 app.add_middleware(
