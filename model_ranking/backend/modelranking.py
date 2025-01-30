@@ -15,6 +15,10 @@ origins = [
     "http://modelranking.arch.be",
     "http://www.arch.be",
     "http://arch.be",
+    "https://modelranking-rest.arch.be",
+    "https://modelranking.arch.be",
+    "https://www.arch.be",
+    "https://arch.be",
 ]
 
 app.add_middleware(

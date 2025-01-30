@@ -81,7 +81,10 @@ export async function loader({params}) {
     const identifier = params.id;
     return fetch(`${import.meta.env.VITE_API_URL}/by_id/${identifier}`,
         {
-            method: "GET"
+            method: "GET",
+		headers: {
+			"Referrer-Policy": "origin-when-cross-origin"
+		}
         }
     ).then(response => {
         if (!response.ok) {

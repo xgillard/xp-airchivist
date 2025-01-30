@@ -19,6 +19,7 @@ function ModelDetails({data, set_ranking}) {
             {
                 method: "POST", 
                 headers: {
+                    "Referrer-Policy": "origin-when-cross-origin",
                     "Content-Type": "application/json;encoding=utf-8",
                 },
                 body: JSON.stringify({
