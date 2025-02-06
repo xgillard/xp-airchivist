@@ -10,7 +10,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",  # development react
+    "http://localhost:5173",  # development react
     "http://modelranking-rest.arch.be",
     "http://modelranking.arch.be",
     "http://www.arch.be",
@@ -53,6 +53,7 @@ class RankingRequest(BaseModel):
 
     identifier: str
     model: str
+    usrname: str
     ranking: int
 
 
@@ -69,7 +70,7 @@ def by_id(identifier: int) -> LabeledData:
     _, mistral7b = by_model_id("mistral7b", identifier)
     _, mistralnemo = by_model_id("mistralnemo", identifier)
     _, gpt4omini = by_model_id("gpt4o-mini", identifier)
-    _, vieille_france = vf_by_model_id("vieille_france", identifier)
+    _, vieille_france = by_model_id("vieille_france", identifier)
     return LabeledData(
         identifier=identifier,
         text=text,
@@ -86,34 +87,39 @@ def by_id(identifier: int) -> LabeledData:
 @app.post("/ranking")
 def set_ranking(request: RankingRequest) -> None:
     """Enregistre le ranking de la labelisation d'un modele."""
-    with sqlite3.connect(f"./databases/{request.model}.db") as con:
+    with sqlite3.connect("./databases/unified.db") as con:
         cursor = con.cursor()
-        cursor.execute("UPDATE dataset SET ranking = ? WHERE id = ?", (request.ranking, request.identifier))
+        cursor.execute(
+            """INSERT INTO ranking(id, model, usrname, ranking)
+                   VALUES (?, ?, ?, ?)
+                   ON CONFLICT(id, model, usrname) DO UPDATE SET
+                   ranking = ?;""",
+            (request.identifier, request.model, request.usrname, request.ranking, request.ranking))
 
 
 def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
     """Renvoie un item labellisé par un modele."""
-    with sqlite3.connect(f"./databases/{model}.db") as con:
+    with sqlite3.connect("./databases/unified.db") as con:
         cursor = con.cursor()
-        cursor.execute("SELECT text, labeling, ranking FROM dataset WHERE id = ?", (identifier,))
+        cursor.execute("""
+            SELECT d.text, l.labeling, coalesce(r.ranking, 0) as rnk
+            FROM documents d
+            JOIN labeling l           ON d.id = l.id
+            FULL OUTER JOIN ranking r ON r.id = l.id AND r.model = l.model 
+            WHERE
+                d.id    = ?  AND
+                l.model = ?""",
+            (identifier, model))
         text, labeling, ranking = cursor.fetchone()
         labeling = json.loads(labeling)
-        docdata = labeling["documentdata"]
-
-        persons = sorted([f"{p['firstname']} {p['lastname']}".lower() for p in docdata["persons"]])
-        locations = sorted([loc["name"].lower() for loc in docdata["locations"]])
-        dates = sorted([docdata["act_date"].lower(), docdata["fact_date"].lower()])
-        return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
-
-
-def vf_by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
-    """Renvoie une donnée labellisée par le modele vieille france."""
-    with sqlite3.connect(f"./databases/{model}.db") as con:
-        cursor = con.cursor()
-        cursor.execute("SELECT text, labeling, ranking FROM dataset WHERE id = ?", (identifier,))
-        text, labeling, ranking = cursor.fetchone()
-        labeling = json.loads(labeling)
-        persons = sorted([p.lower() for p in labeling["persons"]])
-        locations = sorted([loc.lower() for loc in labeling["locations"]])
-        dates = sorted([d.lower() for d in labeling["dates"]])
-        return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
+        if model == "vieille_france":
+            persons = sorted([p.lower() for p in labeling["persons"]])
+            locations = sorted([loc.lower() for loc in labeling["locations"]])
+            dates = sorted([d.lower() for d in labeling["dates"]])
+            return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
+        else:  # noqa: RET505
+            docdata  = labeling["documentdata"]
+            persons = sorted([f"{p['firstname']} {p['lastname']}".lower() for p in docdata["persons"]])
+            locations = sorted([loc["name"].lower() for loc in docdata["locations"]])
+            dates = sorted([docdata["act_date"].lower(), docdata["fact_date"].lower()])
+            return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)

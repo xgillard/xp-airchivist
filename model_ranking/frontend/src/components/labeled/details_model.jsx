@@ -12,6 +12,7 @@ function ModelDetails({data, set_ranking}) {
     const params = useParams();
     const [err, set_err] = useState(null);
     const identifier = params.id;
+    const usrname = params.usrname;
 
     function on_ranking_changed(e, value) {
         set_ranking(value);
@@ -25,6 +26,7 @@ function ModelDetails({data, set_ranking}) {
                 body: JSON.stringify({
                     model: data.model,
                     identifier: identifier,
+                    usrname: usrname,
                     ranking: value,
                 }),
             }

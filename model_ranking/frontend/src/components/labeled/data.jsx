@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { AppBar, Badge, Box, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
 
 import StarsIcon from '@mui/icons-material/Stars';
@@ -15,6 +15,9 @@ export function LabeledData() {
     const loaded = useLoaderData();
     const [data, set_data] = useState(loaded);
     const navigate = useNavigate();
+    const params = useParams();
+
+    const usrname = params.usrname;
 
     useEffect(function () {
         set_data(loaded);
@@ -25,14 +28,14 @@ export function LabeledData() {
         if (x < 0) {
             x = 0;
         }
-        return navigate(`/${x}`);
+        return navigate(`/label/${usrname}/${x}`);
     }
     function forwards(){
         let x = data.identifier + 1;
         if (x >= LIMIT) {
             x = 0;
         }
-        return navigate(`/${x}`);
+        return navigate(`/label/${usrname}/${x}`);
     }
 
     let nb_tasks = 0;

@@ -3,6 +3,8 @@ import { createBrowserRouter, Navigate, RouterProvider, useRouteError } from 're
 import { CssBaseline } from '@mui/material';
 
 import {loader as load_data, LabeledData} from './components/labeled/data';
+import NamePicker from './components/pick_a_name';
+import { useState } from 'react';
 
 function ErrorToast() {
   const error = useRouteError();
@@ -16,8 +18,9 @@ function ErrorToast() {
 
 function App() {
   const router = createBrowserRouter([
-    {path: "*",    element: <Navigate to="0" />},
-    {path: "/:id", element: <LabeledData />, errorElement: <ErrorToast />, loader: load_data}
+    {path: "/",                   element: <Navigate to="/pick"  />},
+    {path: "/pick",               element: <NamePicker  />},
+    {path: "/label/:usrname/:id", element: <LabeledData />, errorElement: <ErrorToast />, loader: load_data}
   ]);
 
   return (
