@@ -101,7 +101,8 @@ export function LabeledData() {
 
 export async function loader({params}) {
     const identifier = params.id;
-    return fetch(`${import.meta.env.VITE_API_URL}/by_id/${identifier}`,
+    const usrname = params.usrname;
+    return fetch(`${import.meta.env.VITE_API_URL}/by_id/${identifier}/${usrname}`,
         {
             method: "GET",
             headers: {

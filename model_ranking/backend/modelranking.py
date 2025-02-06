@@ -63,14 +63,14 @@ def nb_docs() -> int:
     return 419
 
 
-@app.get("/by_id/{identifier}")
-def by_id(identifier: int) -> LabeledData:
+@app.get("/by_id/{identifier}/{usrname}")
+def by_id(identifier: int, usrname: str) -> LabeledData:
     """Renvoie un item labellisé par tous les modeles."""
-    text, llama = by_model_id("llama", identifier)
-    _, mistral7b = by_model_id("mistral7b", identifier)
-    _, mistralnemo = by_model_id("mistralnemo", identifier)
-    _, gpt4omini = by_model_id("gpt4o-mini", identifier)
-    _, vieille_france = by_model_id("vieille_france", identifier)
+    text, llama = by_model_id("llama", identifier, usrname)
+    _, mistral7b = by_model_id("mistral7b", identifier, usrname)
+    _, mistralnemo = by_model_id("mistralnemo", identifier, usrname)
+    _, gpt4omini = by_model_id("gpt4o-mini", identifier, usrname)
+    _, vieille_france = by_model_id("vieille_france", identifier, usrname)
     return LabeledData(
         identifier=identifier,
         text=text,
@@ -122,7 +122,7 @@ def todo(lang: str, usrname: str) -> int | None:
         """, (lang, usrname))
         return cursor.fetchone()[0]
 
-def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
+def by_model_id(model: str, identifier: int, usrname: str) -> tuple[str | None, ModelData | None]:
     """Renvoie un item labellisé par un modele."""
     with sqlite3.connect("./databases/unified.db") as con:
         cursor = con.cursor()
@@ -132,9 +132,10 @@ def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | No
             JOIN labeling l           ON d.id = l.id
             FULL OUTER JOIN ranking r ON r.id = l.id AND r.model = l.model
             WHERE
-                d.id    = ?  AND
-                l.model = ?""",
-            (identifier, model))
+                d.id      = ?  AND
+                l.model   = ?  AND
+                r.usrname = ? """,
+            (identifier, model, usrname))
         text, labeling, ranking = cursor.fetchone()
         labeling = json.loads(labeling)
         if model == "vieille_france":
