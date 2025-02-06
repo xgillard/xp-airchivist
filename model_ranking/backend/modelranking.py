@@ -127,16 +127,24 @@ def by_model_id(model: str, identifier: int, usrname: str) -> tuple[str | None, 
     with sqlite3.connect("./databases/unified.db") as con:
         cursor = con.cursor()
         cursor.execute("""
-            SELECT d.text, l.labeling, coalesce(r.ranking, 0) as rnk
+            SELECT d.text, l.labeling
             FROM documents d
-            JOIN labeling l           ON d.id = l.id
-            FULL OUTER JOIN ranking r ON r.id = l.id AND r.model = l.model
+            JOIN labeling l ON d.id = l.id
             WHERE
                 d.id      = ?  AND
-                l.model   = ?  AND
-                r.usrname = ? """,
+                l.model   = ? """,
+            (identifier, model))
+        text, labeling = cursor.fetchone()
+        # retrieve the user ranking (if it exists)
+        cursor.execute("""
+            SELECT ranking 
+            FROM ranking r
+            WHERE r.id = ?
+            AND   r.model = ?
+            AND r.usrname = ?""",
             (identifier, model, usrname))
-        text, labeling, ranking = cursor.fetchone()
+        ranking = cursor.fetchone()
+        ranking = ranking if ranking is not None else 0
         labeling = json.loads(labeling)
         if model == "vieille_france":
             persons = sorted([p.lower() for p in labeling["persons"]])
