@@ -97,6 +97,31 @@ def set_ranking(request: RankingRequest) -> None:
             (request.identifier, request.model, request.usrname, request.ranking, request.ranking))
 
 
+@app.get("/todo/{lang}/{usrname}")
+def todo(lang: str, usrname: str) -> int | None:
+    """Renvoie l'id d'un document dans la langue voulue qui n'est pas encore traité par l'utilisateur."""
+    with sqlite3.connect("./databases/unified.db") as con:
+        cursor = con.cursor()
+        cursor.execute("""
+            SELECT d.id
+            FROM documents d
+            WHERE d.lang = ?
+            AND EXISTS (
+                SELECT l.model
+                FROM   labeling l
+                WHERE  l.id = d.id
+                AND NOT EXISTS (
+                    SELECT r.ranking
+                    FROM  ranking r
+                    WHERE r.id      = l.id
+                    AND   r.model   = l.model
+                    AND   r.usrname = ?
+                )
+            )
+            ORDER BY RANDOM();
+        """, (lang, usrname))
+        return cursor.fetchone()[0]
+
 def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
     """Renvoie un item labellisé par un modele."""
     with sqlite3.connect("./databases/unified.db") as con:
@@ -105,7 +130,7 @@ def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | No
             SELECT d.text, l.labeling, coalesce(r.ranking, 0) as rnk
             FROM documents d
             JOIN labeling l           ON d.id = l.id
-            FULL OUTER JOIN ranking r ON r.id = l.id AND r.model = l.model 
+            FULL OUTER JOIN ranking r ON r.id = l.id AND r.model = l.model
             WHERE
                 d.id    = ?  AND
                 l.model = ?""",

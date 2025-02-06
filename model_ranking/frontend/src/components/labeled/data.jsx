@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
-import { AppBar, Badge, Box, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, Badge, Box, Button, ButtonGroup, IconButton, Toolbar, Typography } from '@mui/material';
 
 import StarsIcon from '@mui/icons-material/Stars';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
@@ -38,6 +38,23 @@ export function LabeledData() {
         return navigate(`/label/${usrname}/${x}`);
     }
 
+    function by_lang(lang) {
+        fetch(`${import.meta.env.VITE_API_URL}/todo/${lang}/${usrname}`,
+            {
+                method: "GET",
+                headers: {
+                    "Referrer-Policy": "origin-when-cross-origin"
+                }
+            }
+        ).then(response => {
+            if (!response.ok) {
+                throw new Error(`Could not find a ${lang} text to label`);
+            } else {
+                return response.text();
+            }
+        }).then(x => navigate(`/label/${usrname}/${x}`))
+    }
+
     let nb_tasks = 0;
     if (data) {
         for (const v of Object.values(data.docdata)) {
@@ -65,6 +82,8 @@ export function LabeledData() {
                         <Box>
                             <ButtonGroup sx={{right: 0, marginLeft: "auto"}}>
                                 <IconButton size="large"  onClick={backwards}><ArrowBack htmlColor='white'/></IconButton>
+                                <Button color="white" variant="text" onClick={() => by_lang('fr')}>FR</Button> 
+                                <Button color="white" variant="text" onClick={() => by_lang('nl')}>NL</Button> 
                                 <IconButton size="large"  onClick={forwards} ><ArrowFwd  htmlColor='white'/></IconButton>
                             </ButtonGroup>
                         </Box>
@@ -85,9 +104,9 @@ export async function loader({params}) {
     return fetch(`${import.meta.env.VITE_API_URL}/by_id/${identifier}`,
         {
             method: "GET",
-		headers: {
-			"Referrer-Policy": "origin-when-cross-origin"
-		}
+            headers: {
+                "Referrer-Policy": "origin-when-cross-origin"
+            }
         }
     ).then(response => {
         if (!response.ok) {
