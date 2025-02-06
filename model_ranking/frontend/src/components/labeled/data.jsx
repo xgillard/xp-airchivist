@@ -72,7 +72,7 @@ export function LabeledData() {
                         <Box padding="1em">
                             <Typography variant="h6" sx={{ verticalAlign: "middle" }}>
                                 <Badge badgeContent={nb_tasks} color="warning">
-                                    <StarsIcon fontSize="large"/> Model Ranking
+                                    <StarsIcon fontSize="large"/> Ranking
                                 </Badge>
                             </Typography>
                         </Box>
