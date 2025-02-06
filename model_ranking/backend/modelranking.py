@@ -143,8 +143,14 @@ def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | No
             dates = sorted([d.lower() for d in labeling["dates"]])
             return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
         else:  # noqa: RET505
-            docdata  = labeling["documentdata"]
-            persons = sorted([f"{p['firstname']} {p['lastname']}".lower() for p in docdata["persons"]])
-            locations = sorted([loc["name"].lower() for loc in docdata["locations"]])
-            dates = sorted([docdata["act_date"].lower(), docdata["fact_date"].lower()])
+            docdata   = labeling.get("documentdata")
+            persons   = []
+            locations = []
+            dates     = []
+            if docdata and docdata.get("persons"):
+                persons   = sorted([f"{p['firstname']} {p['lastname']}".lower() for p in docdata["persons"]])
+            if docdata and docdata.get("locations"):
+                locations = sorted([loc["name"].lower() for loc in docdata["locations"]])
+            if docdata:
+                dates = sorted([docdata["act_date"].lower(), docdata["fact_date"].lower()])
             return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
