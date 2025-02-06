@@ -68,6 +68,7 @@ def by_id(identifier: int) -> LabeledData:
     text, llama = by_model_id("llama", identifier)
     _, mistral7b = by_model_id("mistral7b", identifier)
     _, mistralnemo = by_model_id("mistralnemo", identifier)
+    _, gpt4omini = by_model_id("gpt4o-mini", identifier)
     _, vieille_france = vf_by_model_id("vieille_france", identifier)
     return LabeledData(
         identifier=identifier,
@@ -76,6 +77,7 @@ def by_id(identifier: int) -> LabeledData:
             "llama": llama,
             "mistral7b": mistral7b,
             "mistralnemo": mistralnemo,
+            "gpt4o-mini": gpt4omini,
             "vieille_france": vieille_france,
         },
     )
@@ -89,7 +91,7 @@ def set_ranking(request: RankingRequest) -> None:
         cursor.execute("UPDATE dataset SET ranking = ? WHERE id = ?", (request.ranking, request.identifier))
 
 
-def by_model_id(model: str, identifier: int) -> (str | None, ModelData | None):
+def by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
     """Renvoie un item labellisé par un modele."""
     with sqlite3.connect(f"./databases/{model}.db") as con:
         cursor = con.cursor()
@@ -104,7 +106,7 @@ def by_model_id(model: str, identifier: int) -> (str | None, ModelData | None):
         return text, ModelData(model=model, ranking=ranking, persons=persons, locations=locations, dates=dates)
 
 
-def vf_by_model_id(model: str, identifier: int) -> (str | None, ModelData | None):
+def vf_by_model_id(model: str, identifier: int) -> tuple[str | None, ModelData | None]:
     """Renvoie une donnée labellisée par le modele vieille france."""
     with sqlite3.connect(f"./databases/{model}.db") as con:
         cursor = con.cursor()
