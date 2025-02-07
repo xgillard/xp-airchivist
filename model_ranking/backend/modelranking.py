@@ -144,7 +144,7 @@ def by_model_id(model: str, identifier: int, usrname: str) -> tuple[str | None, 
             AND r.usrname = ?""",
             (identifier, model, usrname))
         ranking = cursor.fetchone()
-        ranking = ranking if ranking is not None else 0
+        ranking = ranking[0] if ranking is not None else 0
         labeling = json.loads(labeling)
         if model == "vieille_france":
             persons = sorted([p.lower() for p in labeling["persons"]])
