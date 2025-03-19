@@ -71,8 +71,8 @@ def by_id(identifier: int, usrname: str) -> LabeledData:
     _, mistralnemo = by_model_id("mistralnemo", identifier, usrname)
     _, gpt4omini = by_model_id("gpt4o-mini", identifier, usrname)
     _, vieille_france = by_model_id("vieille_france", identifier, usrname)
-    _, vieille_france = by_model_id("vieille_france_v2", identifier, usrname)
-    _, vieille_france = by_model_id("brabant_xvii_ner", identifier, usrname)
+    _, vieille_france_v2 = by_model_id("vieille_france_v2", identifier, usrname)
+    _, brabant_xvii_ner  = by_model_id("brabant_xvii_ner", identifier, usrname)
     return LabeledData(
         identifier=identifier,
         text=text,
@@ -82,6 +82,8 @@ def by_id(identifier: int, usrname: str) -> LabeledData:
             "mistralnemo": mistralnemo,
             "gpt4o-mini": gpt4omini,
             "vieille_france": vieille_france,
+            "vieille_france_v2": vieille_france_v2,
+            "brabant_xvii_ner": brabant_xvii_ner,
         },
     )
 
