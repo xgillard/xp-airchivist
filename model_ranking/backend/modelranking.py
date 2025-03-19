@@ -71,6 +71,8 @@ def by_id(identifier: int, usrname: str) -> LabeledData:
     _, mistralnemo = by_model_id("mistralnemo", identifier, usrname)
     _, gpt4omini = by_model_id("gpt4o-mini", identifier, usrname)
     _, vieille_france = by_model_id("vieille_france", identifier, usrname)
+    _, vieille_france = by_model_id("vieille_france_v2", identifier, usrname)
+    _, vieille_france = by_model_id("brabant_xvii_ner", identifier, usrname)
     return LabeledData(
         identifier=identifier,
         text=text,
@@ -146,7 +148,7 @@ def by_model_id(model: str, identifier: int, usrname: str) -> tuple[str | None, 
         ranking = cursor.fetchone()
         ranking = ranking[0] if ranking is not None else 0
         labeling = json.loads(labeling)
-        if model == "vieille_france":
+        if model in ["vieille_france", "vieille_france_v2", "brabant_xvii_ner"]:
             persons = sorted([p.lower() for p in labeling["persons"]])
             locations = sorted([loc.lower() for loc in labeling["locations"]])
             dates = sorted([d.lower() for d in labeling["dates"]])
