@@ -10,7 +10,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",  # development react
+    "http://localhost",  # development react
     "http://modelranking-rest.arch.be",
     "http://modelranking.arch.be",
     "http://www.arch.be",
@@ -66,24 +66,24 @@ def nb_docs() -> int:
 @app.get("/by_id/{identifier}/{usrname}")
 def by_id(identifier: int, usrname: str) -> LabeledData:
     """Renvoie un item labellisé par tous les modeles."""
-    text, llama = by_model_id("llama", identifier, usrname)
-    _, mistral7b = by_model_id("mistral7b", identifier, usrname)
-    _, mistralnemo = by_model_id("mistralnemo", identifier, usrname)
-    _, gpt4omini = by_model_id("gpt4o-mini", identifier, usrname)
-    _, vieille_france = by_model_id("vieille_france", identifier, usrname)
-    _, vieille_france_v2 = by_model_id("vieille_france_v2", identifier, usrname)
-    _, brabant_xvii_ner  = by_model_id("brabant_xvii_ner", identifier, usrname)
+    text, a = by_model_id("A", identifier, usrname)
+    _, b = by_model_id("B", identifier, usrname)
+    _, c = by_model_id("C", identifier, usrname)
+    _, d = by_model_id("D", identifier, usrname)
+    _, e = by_model_id("E", identifier, usrname)
+    _, f = by_model_id("F", identifier, usrname)
+    _, g = by_model_id("G", identifier, usrname)
     return LabeledData(
         identifier=identifier,
         text=text,
         docdata={
-            "llama": llama,
-            "mistral7b": mistral7b,
-            "mistralnemo": mistralnemo,
-            "gpt4o-mini": gpt4omini,
-            "vieille_france": vieille_france,
-            "vieille_france_v2": vieille_france_v2,
-            "brabant_xvii_ner": brabant_xvii_ner,
+            "A": a,
+            "B": b,
+            "C": c,
+            "D": d,
+            "E": e,
+            "F": f,
+            "G": g,
         },
     )
 
@@ -150,7 +150,7 @@ def by_model_id(model: str, identifier: int, usrname: str) -> tuple[str | None, 
         ranking = cursor.fetchone()
         ranking = ranking[0] if ranking is not None else 0
         labeling = json.loads(labeling)
-        if model in ["vieille_france", "vieille_france_v2", "brabant_xvii_ner"]:
+        if model in ["E", "F", "G"]: # vieille-france, vieille-france-v2, brabant-xvii-ner
             persons = sorted([p.lower() for p in labeling["persons"]])
             locations = sorted([loc.lower() for loc in labeling["locations"]])
             dates = sorted([d.lower() for d in labeling["dates"]])
